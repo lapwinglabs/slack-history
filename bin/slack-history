@@ -1,0 +1,57 @@
+#!/usr/bin/env node
+
+var history = require('../')
+var args = process.argv.slice(2)
+var token = process.env.SLACK_TOKEN
+var moment = require('moment')
+var channel = args[0]
+
+if (!token || !channel) {
+  console.error('usage: SLACK_TOKEN=... slack-history <channel>')
+  process.exit(1)
+}
+
+/**
+ * Fetch the whole history
+ */
+
+history(token, channel, function(err, messages) {
+  if (err) throw err
+  console.log(format(messages))
+})
+
+/**
+ * Format
+ *
+ * Right now it aggregates messages by user,
+ * but this could abstracted to do anything else
+ *
+ * @param {Array} messages
+ * @return
+ */
+
+function format (messages) {
+  return messages
+    .sort((a, b) => {
+      var ats = new Date(+a.ts.split('.')[0] * 1000)
+      var bts = new Date(+b.ts.split('.')[0] * 1000)
+      if (a.username < b.username) return -1
+      if (a.username > b.username) return 1
+      if (ats < bts) return -1
+      if (ats > bts) return 1
+      return 0
+    })
+    .map(msg => `${msg.username} [${moment(ts_to_date(msg.ts)).fromNow()}]: ${msg.text}`)
+    .join('\n')
+}
+
+/**
+ * Timestamp to Date
+ *
+ * @param {String} ts
+ * @return {Date}
+ */
+
+function ts_to_date (ts) {
+  return new Date(+ts.split('.')[0] * 1000)
+}

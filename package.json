@@ -1,0 +1,13 @@
+{
+  "name": "slack-history",
+  "version": "1.0.0",
+  "description": "get the history of a slack channel or group",
+  "dependencies": {
+    "array-find": "^1.0.0",
+    "moment": "^2.10.6",
+    "superagent": "^1.4.0"
+  },
+  "bin": {
+    "slack-history": "./bin/slack-history"
+  }
+}
